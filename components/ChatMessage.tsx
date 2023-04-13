@@ -3,6 +3,9 @@ import * as React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
+import { Sandpack, SandpackFiles } from '@codesandbox/sandpack-react';
+import { githubLight, monokaiPro } from '@codesandbox/sandpack-themes';
+
 import Prism from 'prismjs';
 import 'prismjs/themes/prism.css';
 import 'prismjs/components/prism-bash';
@@ -24,11 +27,13 @@ import FastForwardIcon from '@mui/icons-material/FastForward';
 import FormatPaintIcon from '@mui/icons-material/FormatPaint';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined';
+import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import ReplayIcon from '@mui/icons-material/Replay';
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import ShapeLineOutlinedIcon from '@mui/icons-material/ShapeLineOutlined';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
+import StopOutlinedIcon from '@mui/icons-material/StopOutlined';
 import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
 
 import { DMessage } from '@/lib/stores/store-chats';
@@ -160,6 +165,42 @@ const parseBlocks = (forceText: boolean, text: string): Block[] => {
 
 /// Renderers for the different types of message blocks
 
+type SandpackConfig = { files: SandpackFiles, template: 'vanilla-ts' | 'vanilla' };
+
+const runnableLanguages = ['html', 'javascript', 'typescript'];
+
+function RunnableCode({ codeBlock }: { codeBlock: CodeBlock }): JSX.Element | null {
+  const theme = useTheme();
+  let config: SandpackConfig;
+  switch (codeBlock.language) {
+    case 'html':
+      config = {
+        template: 'vanilla',
+        files: { '/index.html': codeBlock.code, '/index.js': '' },
+      };
+      break;
+    case 'javascript':
+    case 'typescript':
+      config = {
+        template: 'vanilla-ts',
+        files: { '/index.ts': codeBlock.code },
+      };
+      break;
+    default:
+      return null;
+  }
+  return (
+    <Box onDoubleClick={e => e.stopPropagation()}>
+      <Sandpack
+        {...config}
+        theme={theme.palette.mode === 'dark' ? monokaiPro : githubLight}
+        options={{ showConsole: true, showConsoleButton: true, showTabs: true, showNavigator: false }}
+      />
+    </Box>
+  );
+}
+
+
 function RenderCode(props: { codeBlock: CodeBlock, sx?: SxProps }) {
   const [showSVG, setShowSVG] = React.useState(true);
 
@@ -176,6 +217,10 @@ function RenderCode(props: { codeBlock: CodeBlock, sx?: SxProps }) {
     e.stopPropagation();
     copyToClipboard(props.codeBlock.code);
   };
+
+  const [showSandpack, setShowSandpack] = React.useState(false);
+  const handleToggleSandpack = () => setShowSandpack(!showSandpack);
+  const showRunIcon = props.codeBlock.complete && !!props.codeBlock.language && runnableLanguages.includes(props.codeBlock.language);
 
   return (
     <Box
@@ -197,6 +242,13 @@ function RenderCode(props: { codeBlock: CodeBlock, sx?: SxProps }) {
           display: 'flex', flexDirection: 'row', gap: 1,
           opacity: 0, transition: 'opacity 0.3s',
         }}>
+        {showRunIcon && (
+          <Tooltip title={showSandpack ? 'Close editor' : 'Try it out'} variant='solid'>
+            <IconButton variant='outlined' color={showSandpack ? 'neutral' : 'primary'} onClick={handleToggleSandpack}>
+              {showSandpack ? <StopOutlinedIcon /> : <PlayArrowOutlinedIcon />}
+            </IconButton>
+          </Tooltip>
+        )}
         {hasSVG && (
           <Tooltip title={renderSVG ? 'Show Code' : 'Render SVG'} variant='solid'>
             <IconButton variant={renderSVG ? 'solid' : 'soft'} color='neutral' onClick={() => setShowSVG(!showSVG)}>
@@ -222,6 +274,9 @@ function RenderCode(props: { codeBlock: CodeBlock, sx?: SxProps }) {
         dangerouslySetInnerHTML={{ __html: renderSVG ? props.codeBlock.code : props.codeBlock.content }}
         sx={renderSVG ? { lineHeight: 0 } : {}}
       />
+
+      {/* Run widget */}
+      {showRunIcon && showSandpack && <RunnableCode codeBlock={props.codeBlock} />}
     </Box>
   );
 }
