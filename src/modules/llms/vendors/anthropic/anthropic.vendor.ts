@@ -49,7 +49,7 @@ export const ModelVendorAnthropic: IModelVendor<SourceSetupAnthropic, AnthropicA
   rpcUpdateModelsQuery: (access, enabled, onSuccess) => {
     return apiQuery.llmAnthropic.listModels.useQuery({ access }, {
       enabled: enabled,
-      onSuccess: onSuccess,
+      // onSuccess: onSuccess,
       refetchOnWindowFocus: false,
       staleTime: Infinity,
     });

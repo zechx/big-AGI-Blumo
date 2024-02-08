@@ -63,7 +63,7 @@ export const ModelVendorGemini: IModelVendor<SourceSetupGemini, GeminiAccessSche
   rpcUpdateModelsQuery: (access, enabled, onSuccess) => {
     return apiQuery.llmGemini.listModels.useQuery({ access }, {
       enabled: enabled,
-      onSuccess: onSuccess,
+      // onSuccess: onSuccess,
       refetchOnWindowFocus: false,
       staleTime: Infinity,
     });

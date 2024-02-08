@@ -54,16 +54,16 @@ export function useElevenLabsVoices() {
 
   const isConfigured = isElevenLabsEnabled(apiKey);
 
-  const { data, isLoading, isError } = apiQuery.elevenlabs.listVoices.useQuery({ elevenKey: apiKey }, {
+  const { data, isPending, isError } = apiQuery.elevenlabs.listVoices.useQuery({ elevenKey: apiKey }, {
     enabled: isConfigured,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   return {
     isConfigured,
-    isLoading,
+    isPending,
     isError,
-    hasVoices: !isLoading && !!data?.voices.length,
+    hasVoices: !isPending && !!data?.voices.length,
     voices: data?.voices || [],
   };
 }
@@ -72,7 +72,7 @@ export function useElevenLabsVoices() {
 export function useElevenLabsVoiceDropdown(autoSpeak: boolean, disabled?: boolean) {
 
   // external state
-  const { isConfigured, isLoading, isError, hasVoices, voices } = useElevenLabsVoices();
+  const { isConfigured, isPending, isError, hasVoices, voices } = useElevenLabsVoices();
   const [voiceId, setVoiceId] = useElevenLabsVoiceId();
 
   // derived state
@@ -87,11 +87,11 @@ export function useElevenLabsVoiceDropdown(autoSpeak: boolean, disabled?: boolea
 
   const voicesDropdown = React.useMemo(() =>
       <VoicesDropdown
-        isValidKey={isConfigured} isLoadingVoices={isLoading} isErrorVoices={isError} disabled={disabled}
+        isValidKey={isConfigured} isLoadingVoices={isPending} isErrorVoices={isError} disabled={disabled}
         voices={voices}
         voiceId={voiceId} setVoiceId={setVoiceId}
       />,
-    [disabled, isConfigured, isError, isLoading, setVoiceId, voiceId, voices],
+    [disabled, isConfigured, isError, isPending, setVoiceId, voiceId, voices],
   );
 
   return {

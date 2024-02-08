@@ -62,7 +62,7 @@ export const ModelVendorOpenAI: IModelVendor<SourceSetupOpenAI, OpenAIAccessSche
   rpcUpdateModelsQuery: (access, enabled, onSuccess) => {
     return apiQuery.llmOpenAI.listModels.useQuery({ access }, {
       enabled: enabled,
-      onSuccess: onSuccess,
+      // onSuccess: onSuccess,
       refetchOnWindowFocus: false,
       staleTime: Infinity,
     });

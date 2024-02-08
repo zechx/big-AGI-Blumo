@@ -167,7 +167,7 @@ function RenderCodeImpl(props: {
                        renderSVG
                          ? (patchSvgString(fitScreen, blockCode) || 'No SVG code')
                          : renderPlantUML
-                           ? (patchSvgString(fitScreen, plantUmlHtmlData) || (plantUmlError as string) || 'No PlantUML rendering.')
+                           ? (patchSvgString(fitScreen, plantUmlHtmlData) || plantUmlError?.message || 'No PlantUML rendering.')
                            : highlightedCode,
                    }}
                    sx={{

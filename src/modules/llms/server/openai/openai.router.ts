@@ -274,6 +274,9 @@ export const llmOpenAIRouter = createTRPCRouter({
     .output(t2iCreateImagesOutputSchema)
     .mutation(async ({ input: { access, request } }) => {
 
+      if (Math.random() < 0.5)
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'XXX' });
+
       // Validate input
       if (request.model === 'dall-e-3' && request.count > 1)
         throw new TRPCError({ code: 'BAD_REQUEST', message: `[OpenAI Issue] dall-e-3 model does not support more than 1 image` });

@@ -42,7 +42,7 @@ export const ModelVendorOllama: IModelVendor<SourceSetupOllama, OllamaAccessSche
   rpcUpdateModelsQuery: (access, enabled, onSuccess) => {
     return apiQuery.llmOllama.listModels.useQuery({ access }, {
       enabled: enabled,
-      onSuccess: onSuccess,
+      // onSuccess: onSuccess,
       refetchOnWindowFocus: false,
       staleTime: Infinity,
     });

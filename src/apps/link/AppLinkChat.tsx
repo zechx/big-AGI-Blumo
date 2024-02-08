@@ -110,7 +110,7 @@ export function AppLinkChat(props: { chatLinkId: string | null }) {
 
   // external state
   const sharedChatLinkItems = useSharedChatLinkItems();
-  const { data, isError, error, isLoading } = useQuery({
+  const { data, isError, error, isPending } = useQuery({
     enabled: !!linkId,
     queryKey: ['chat-link', linkId],
     queryFn: () => fetchStoredChatV1(linkId),
@@ -212,7 +212,7 @@ export function AppLinkChat(props: { chatLinkId: string | null }) {
 
     {isListPage
       ? <ListPlaceholder hasLinks={hasLinks} />
-      : isLoading
+      : isPending
         ? <ShowLoading />
         : isError
           ? <ShowError error={error} />

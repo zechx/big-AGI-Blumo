@@ -6,7 +6,7 @@
  *
  * We also create a few inference helpers for input and output types.
  */
-import { createTRPCProxyClient, httpBatchLink, httpLink, loggerLink } from '@trpc/client';
+import { createTRPCClient, httpBatchLink, httpLink, loggerLink } from '@trpc/client';
 import { createTRPCNext } from '@trpc/next';
 import superjson from 'superjson';
 
@@ -28,31 +28,16 @@ const enableLoggerLink = (opts: any) => {
 export const apiQuery = createTRPCNext<AppRouterEdge>({
   config() {
     return {
-      /**
-       * Transformer used for data de-serialization from the server.
-       *
-       * @see https://trpc.io/docs/data-transformers
-       */
-      transformer: superjson,
-
-      /**
-       * Links used to determine request flow from client to server.
-       *
-       * @see https://trpc.io/docs/links
-       */
       links: [
         loggerLink({ enabled: enableLoggerLink }),
         httpBatchLink({
           url: `${getBaseUrl()}/api/trpc-edge`,
+          transformer: superjson,
         }),
       ],
     };
   },
-  /**
-   * Whether tRPC should await queries when server rendering pages.
-   *
-   * @see https://trpc.io/docs/nextjs#ssr-boolean-default-false
-   */
+  transformer: superjson,
   ssr: false,
 });
 
@@ -60,12 +45,12 @@ export const apiQuery = createTRPCNext<AppRouterEdge>({
 /**
  * Typesafe async/await hooks for the the Edge-Runtime API
  */
-export const apiAsync = createTRPCProxyClient<AppRouterEdge>({
-  transformer: superjson,
+export const apiAsync = createTRPCClient<AppRouterEdge>({
   links: [
     loggerLink({ enabled: enableLoggerLink }),
-    httpLink({
+    httpBatchLink({
       url: `${getBaseUrl()}/api/trpc-edge`,
+      transformer: superjson,
     }),
   ],
 });
@@ -74,12 +59,12 @@ export const apiAsync = createTRPCProxyClient<AppRouterEdge>({
 /**
  * Node/Immediate API: Typesafe async/await hooks for the the Node functions API
  */
-export const apiAsyncNode = createTRPCProxyClient<AppRouterNode>({
-  transformer: superjson,
+export const apiAsyncNode = createTRPCClient<AppRouterNode>({
   links: [
     loggerLink({ enabled: enableLoggerLink }),
-    httpLink({
+    httpBatchLink({
       url: `${getBaseUrl()}/api/trpc-node`,
+      transformer: superjson,
     }),
   ],
 });
